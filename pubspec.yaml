@@ -21,6 +21,6 @@ flutter:
     platforms:
       android:
         package: uk.co.moodio.msal_flutter
-        pluginClass: MsalFlutterPluginV2
+        pluginClass: MsalFlutterPlugin
       ios:
         pluginClass: MsalFlutterPlugin
