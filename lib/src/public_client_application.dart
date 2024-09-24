@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:developer';
 import 'dart:io' show Platform;
 import 'package:flutter/services.dart';
 import 'package:msal_flutter/src/exceptions/msal_scope_error_exception.dart';
@@ -57,21 +56,13 @@ class PublicClientApplication {
         keychain: keychain,
         privateSession: privateSession);
     await res._initialize();
-    try {
-      await res.loadAccounts();
-    } catch (e) {
-      log(e.toString());
-    }
     return res;
   }
 
   /// Acquire a token interactively for the given [scopes]
-  Future<String> acquireToken(List<String> scopes, [bool? clearSession]) async {
+  Future<String> acquireToken(List<String> scopes) async {
     //create the arguments
     var res = <String, dynamic>{'scopes': scopes};
-    if (clearSession != null) {
-      res['clearSession'] = clearSession;
-    }
     //call platform
     try {
       final String token = await _channel.invokeMethod('acquireToken', res);
@@ -85,31 +76,11 @@ class PublicClientApplication {
     }
   }
 
-  /// Acquire a token interactively for the given [scopes]
-  Future<List<Map<String,dynamic>>> loadAccounts() async {
-    //create the arguments
-    var res = <String, dynamic>{};
-
-    //call platform
-    try {
-      final map = await _channel.invokeMethod('loadAccounts', res);
-
-      return map;
-    } on PlatformException catch (e) {
-      print(e.toString());
-      throw _convertException(e);
-    } catch (e) {
-      print(e);
-      rethrow;
-    }
-  }
-
   /// Acquire a token silently, with no user interaction, for the given [scopes]
-  Future<String> acquireTokenSilent(
-    List<String> scopes,
-  ) async {
+  Future<String> acquireTokenSilent(List<String> scopes) async {
     //create the arguments
     var res = <String, dynamic>{'scopes': scopes};
+
     //call platform
     try {
       final String token =
@@ -185,8 +156,7 @@ class PublicClientApplication {
     }
 
     try {
-      final result = await _channel.invokeMethod('initialize', res);
-      return result;
+      await _channel.invokeMethod('initialize', res);
     } on PlatformException catch (e) {
       throw _convertException(e);
     }
